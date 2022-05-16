@@ -1,7 +1,7 @@
 const express = require('express');
 const STATUS_CODE = require('../constants/httpStatus');
 const generateToken = require('../helpers/generateToken');
-const validateLogin = require('../middlewares/validateLogin');
+const { validateLogin } = require('../middlewares');
 
 const router = express.Router();
 
