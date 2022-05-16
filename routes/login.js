@@ -1,10 +1,11 @@
 const express = require('express');
 const STATUS_CODE = require('../constants/httpStatus');
 const generateToken = require('../helpers/generateToken');
+const validateLogin = require('../middlewares/validateLogin');
 
 const router = express.Router();
 
-router.route('/').post((req, res) => {
+router.route('/').post(validateLogin, (_req, res) => {
   const token = generateToken();
   res.status(STATUS_CODE.OK).json({ token });
 });
