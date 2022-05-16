@@ -40,7 +40,7 @@ function validateTalkRate(rate, res) {
 }
 
 function validateTalk(talk, res) {
-  if (!talk || !talk.watchedAt || !talk.rate) {
+  if (!talk || !talk.watchedAt || talk.rate === undefined) {
     return res
       .status(STATUS_CODE.BAD_REQUEST)
       .json({ message: MESSAGE.MANDATORY_TALK });

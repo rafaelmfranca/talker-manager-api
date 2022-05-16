@@ -2,7 +2,8 @@ const express = require('express');
 const rescue = require('express-rescue');
 const STATUS_CODE = require('../constants/httpStatus');
 const MESSAGE = require('../constants/messages');
-const { getTalkers, updateTalkers } = require('../helpers/fs');
+const findTalkerById = require('../helpers/findTalkerById');
+const { getTalkers, addTalker, editTalker } = require('../helpers/fs');
 const { validateToken, validateCreateTalker } = require('../middlewares');
 
 const router = express.Router();
@@ -22,27 +23,40 @@ router
     rescue(async (req, res) => {
       const { talker } = req;
 
-      const talkerWithId = await updateTalkers(talker);
+      const talkerWithId = await addTalker(talker);
 
       res.status(STATUS_CODE.CREATED).json(talkerWithId);
     }),
   );
 
-router.route('/:id').get(
-  rescue(async (req, res) => {
-    const { id } = req.params;
+router
+  .route('/:id')
+  .get(
+    rescue(async (req, res) => {
+      const { id } = req.params;
 
-    const talkers = await getTalkers();
-    const specifiedTalker = talkers.find((talker) => talker.id === Number(id));
+      const talker = await findTalkerById(id);
 
-    if (!specifiedTalker) {
-      res
-        .status(STATUS_CODE.NOT_FOUND)
-        .json({ message: MESSAGE.TALKER_NOT_FOUND });
-    }
+      if (!talker) {
+        res
+          .status(STATUS_CODE.NOT_FOUND)
+          .json({ message: MESSAGE.TALKER_NOT_FOUND });
+      }
 
-    res.status(STATUS_CODE.OK).json(specifiedTalker);
-  }),
-);
+      res.status(STATUS_CODE.OK).json(talker);
+    }),
+  )
+  .put(
+    validateToken,
+    validateCreateTalker,
+    rescue(async (req, res) => {
+      const { id } = req.params;
+      const { talker } = req;
+
+      await editTalker(talker, id);
+
+      res.status(STATUS_CODE.OK).json({ id: Number(id), ...talker });
+    }),
+  );
 
 module.exports = router;
