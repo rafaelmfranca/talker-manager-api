@@ -48,4 +48,16 @@ async function editTalker(updatedTalker, id) {
   }
 }
 
-module.exports = { getTalkers, addTalker, editTalker };
+async function deleteTalker(id) {
+  try {
+    const talkers = await getTalkers();
+
+    const updatedTalkers = talkers.filter((talker) => talker.id !== Number(id));
+
+    await fs.writeFile('talker.json', JSON.stringify(updatedTalkers));
+  } catch (err) {
+    throw Error(err.message);
+  }
+}
+
+module.exports = { getTalkers, addTalker, editTalker, deleteTalker };
