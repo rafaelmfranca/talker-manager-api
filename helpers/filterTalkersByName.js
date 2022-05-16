@@ -6,8 +6,6 @@ async function filterTalkersByName(query) {
   const filteredTalkers = talkers.filter(({ name }) =>
     name.toLowerCase().includes(query.toLowerCase()));
 
-  console.log(filteredTalkers);
-
   return filteredTalkers;
 }
 

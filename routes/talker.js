@@ -41,7 +41,13 @@ router
     validateToken,
     validateCreateTalker,
     rescue(async (req, res) => {
-      const { talker } = req;
+      const { name, age, talk } = req.body;
+
+      const talker = {
+        name,
+        age,
+        talk,
+      };
 
       const talkerWithId = await addTalker(talker);
 
@@ -70,12 +76,18 @@ router
     validateToken,
     validateCreateTalker,
     rescue(async (req, res) => {
-      const { id } = req.params;
-      const { talker } = req;
+      const { id: paramsId } = req.params;
+      const { name, age, talk } = req.body;
 
-      await editTalker(talker, id);
+      const talker = {
+        name,
+        age,
+        talk,
+      };
 
-      res.status(STATUS_CODE.OK).json({ id: Number(id), ...talker });
+      await editTalker(talker, paramsId);
+
+      res.status(STATUS_CODE.OK).json({ id: Number(paramsId), ...talker });
     }),
   )
   .delete(

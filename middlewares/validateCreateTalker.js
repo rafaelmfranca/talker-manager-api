@@ -3,7 +3,9 @@ const MESSAGE = require('../constants/messages');
 
 const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
 
-function validateName(name, res) {
+function validateName(req, res, next) {
+  const { name } = req.body;
+
   if (!name) {
     return res
       .status(STATUS_CODE.BAD_REQUEST)
@@ -15,9 +17,13 @@ function validateName(name, res) {
       .status(STATUS_CODE.BAD_REQUEST)
       .json({ message: MESSAGE.INVALID_NAME });
   }
+
+  next();
 }
 
-function validateAge(age, res) {
+function validateAge(req, res, next) {
+  const { age } = req.body;
+
   if (!age) {
     return res
       .status(STATUS_CODE.BAD_REQUEST)
@@ -29,17 +35,13 @@ function validateAge(age, res) {
       .status(STATUS_CODE.BAD_REQUEST)
       .json({ message: MESSAGE.INVALID_AGE });
   }
+
+  next();
 }
 
-function validateTalkRate(rate, res) {
-  if (rate < 1 || rate > 5) {
-    return res
-      .status(STATUS_CODE.BAD_REQUEST)
-      .json({ message: MESSAGE.INVALID_RATE });
-  }
-}
+function validateTalk(req, res, next) {
+  const { talk } = req.body;
 
-function validateTalk(talk, res) {
   if (!talk || !talk.watchedAt || talk.rate === undefined) {
     return res
       .status(STATUS_CODE.BAD_REQUEST)
@@ -52,19 +54,28 @@ function validateTalk(talk, res) {
       .json({ message: MESSAGE.INVALID_DATE });
   }
 
-  validateTalkRate(talk.rate, res);
+  next();
 }
 
-function validateCreateTalker(req, res, next) {
-  const { name, age, talk } = req.body;
+function validateTalkRate(req, res, next) {
+  const {
+    talk: { rate },
+  } = req.body;
 
-  validateName(name, res);
-  validateAge(age, res);
-  validateTalk(talk, res);
-
-  req.talker = { name, age, talk };
+  if (rate < 1 || rate > 5) {
+    return res
+      .status(STATUS_CODE.BAD_REQUEST)
+      .json({ message: MESSAGE.INVALID_RATE });
+  }
 
   next();
 }
+
+const validateCreateTalker = [
+  validateName,
+  validateAge,
+  validateTalk,
+  validateTalkRate,
+];
 
 module.exports = validateCreateTalker;
