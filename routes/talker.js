@@ -2,6 +2,7 @@ const express = require('express');
 const rescue = require('express-rescue');
 const STATUS_CODE = require('../constants/httpStatus');
 const MESSAGE = require('../constants/messages');
+const filterTalkersByName = require('../helpers/filterTalkersByName');
 const findTalkerById = require('../helpers/findTalkerById');
 const {
   getTalkers,
@@ -12,6 +13,20 @@ const {
 const { validateToken, validateCreateTalker } = require('../middlewares');
 
 const router = express.Router();
+
+router.route('/search').get(
+  validateToken,
+  rescue(async (req, res) => {
+    const { q: query } = req.query;
+
+    let talkers = [];
+
+    if (!query) talkers = await getTalkers();
+    else talkers = await filterTalkersByName(query);
+
+    res.status(STATUS_CODE.OK).json(talkers);
+  }),
+);
 
 router
   .route('/')

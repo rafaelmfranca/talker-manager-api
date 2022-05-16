@@ -5,13 +5,13 @@ function validateToken(req, res, next) {
   const { authorization } = req.headers;
 
   if (!authorization) {
-    res
+    return res
       .status(STATUS_CODE.UNAUTHORIZED)
       .json({ message: MESSAGE.MANDATORY_TOKEN });
   }
 
   if (authorization.length !== 16) {
-    res
+    return res
       .status(STATUS_CODE.UNAUTHORIZED)
       .json({ message: MESSAGE.INVALID_TOKEN });
   }
